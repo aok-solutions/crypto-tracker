@@ -1,14 +1,41 @@
-import React from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import React from 'react'
+import { StyleSheet, TextInput, View, FlatList } from 'react-native'
+import { List, ListItem, FormInput } from 'react-native-elements'
 
 export default class App extends React.Component {
+  constructor(props) {
+      super(props)
+      this.state = {
+        cryptoList: [
+          {name: 'BTC'},
+          {name: 'ETH'},
+          {name: 'ZRX'}
+        ]
+      }
+  }
+
+  renderSeparator = () => <View style={styles.separator}/>
+
   render() {
     return (
       <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          placeholder = "Search for Crypto..."
+        <FormInput
+          placeholder="Search for crypto..."
+          containerStyle={{ marginBottom: 20, marginTop: 50 }}
+        />
+        <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
+          <FlatList
+            data={this.state.cryptoList}
+            keyExtractor={item => item.name}
+            renderItem={({item}) => (
+              <ListItem
+                title={item.name}
+                containerStyle={{ borderBottomWidth: 0 }}
+              />
+            )}
+            ItemSeparatorComponent={this.renderSeparator}
           />
+        </List>
       </View>
     );
   }
@@ -17,20 +44,12 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
     backgroundColor: '#fff',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    padding: 50
+    paddingTop: 30
   },
 
-  input: {
-    height: 40,
-    width: '80%',
-    borderColor: '#fff',
-    borderBottomColor: '#ddd',
-    borderWidth: 2,
-    paddingLeft: 15,
-    paddingRight: 15
+  separator: {
+    height: 1,
+    backgroundColor: '#CED0CE'
   }
 });
