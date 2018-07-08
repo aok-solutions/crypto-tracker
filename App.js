@@ -19,7 +19,10 @@ class CoinList extends React.Component {
     axios.get(url)
       .then((response) => {
         let coinList = Object.entries(response.data.Data).map(coin => {
-          return {name: coin[1].FullName}
+          return {
+            name: coin[1].FullName,
+            symbol: coin[1].Symbol
+          }
         })
 
         this.setState({
@@ -55,7 +58,7 @@ class CoinList extends React.Component {
               <ListItem
                 title={item.name}
                 containerStyle={{ borderBottomWidth: 0 }}
-                onPress={() => this.props.navigation.navigate('Details', {name: item.name})}
+                onPress={() => this.props.navigation.navigate('Details', { symbol: item.symbol })}
               />
             )}
             ItemSeparatorComponent={this.renderSeparator}
