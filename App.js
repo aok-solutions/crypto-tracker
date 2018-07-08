@@ -1,9 +1,11 @@
 import React from 'react'
 import { StyleSheet, TextInput, View, FlatList } from 'react-native'
 import { List, ListItem, FormInput } from 'react-native-elements'
+import { createStackNavigator } from 'react-navigation'
+import Coin from './Coin'
 import axios from 'axios'
 
-export default class App extends React.Component {
+class CoinList extends React.Component {
   constructor(props) {
       super(props)
       this.state = {
@@ -42,7 +44,6 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <FormInput
           placeholder="Search for crypto..."
-          containerStyle={{ marginBottom: 20, marginTop: 50 }}
           onFocus={this.fetchCoins}
           onChangeText={this.filterCoins}
         />
@@ -54,6 +55,7 @@ export default class App extends React.Component {
               <ListItem
                 title={item.name}
                 containerStyle={{ borderBottomWidth: 0 }}
+                onPress={() => this.props.navigation.navigate('Details', {name: item.name})}
               />
             )}
             ItemSeparatorComponent={this.renderSeparator}
@@ -61,6 +63,19 @@ export default class App extends React.Component {
         </List>
       </View>
     );
+  }
+}
+
+const RootStack = createStackNavigator({
+  Home: CoinList,
+  Details: Coin
+},{
+  initialRouteName: 'Home'
+})
+
+export default class App extends React.Component {
+  render() {
+    return <RootStack />
   }
 }
 
@@ -75,4 +90,4 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#CED0CE'
   }
-});
+})
