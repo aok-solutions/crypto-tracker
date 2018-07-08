@@ -7,11 +7,12 @@ export default class App extends React.Component {
   constructor(props) {
       super(props)
       this.state = {
+        coins: [],
         cryptoList: []
       }
   }
 
-  fetchCrypto = () => {
+  fetchCoins = () => {
     const url = 'https://min-api.cryptocompare.com/data/all/coinlist'
     axios.get(url)
       .then((response) => {
@@ -20,10 +21,18 @@ export default class App extends React.Component {
         })
 
         this.setState({
+          coins: coinList,
           cryptoList: coinList
         })
       })
       .catch((error) => console.log('error fetching coin list: ', error))
+  }
+
+  filterCoins = (text) => {
+    let filteredCoins = this.state.coins.filter((coin) => coin.name.toLowerCase().includes(text.toLowerCase()))
+    this.setState({
+      cryptoList: filteredCoins
+    })
   }
 
   renderSeparator = () => <View style={styles.separator}/>
@@ -34,7 +43,8 @@ export default class App extends React.Component {
         <FormInput
           placeholder="Search for crypto..."
           containerStyle={{ marginBottom: 20, marginTop: 50 }}
-          onFocus={this.fetchCrypto}
+          onFocus={this.fetchCoins}
+          onChangeText={this.filterCoins}
         />
         <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
           <FlatList
