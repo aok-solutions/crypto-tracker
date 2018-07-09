@@ -9,14 +9,26 @@ export default class Coin extends React.Component {
     const { navigation } = this.props
     const symbol = navigation.getParam("symbol", "")
     this.socket = ioClient('https://streamer.cryptocompare.com/')
-
     this.subscribeToCoinUpdates(symbol)
 
     this.state = {
       symbol: symbol,
-      price: 0,
+      price: '',
       lastMarket: '',
       tradeId: ''
+    }
+  }
+
+  priceChanged = (flag) => flag == CryptoCompare.PRICEUP || flag == CryptoCompare.PRICEDOWN
+
+  updateCoin = (message, keys) => {
+    let values = message.split('~')
+
+    let updatedCoin = keys.split('~').reduce((obj, key, index) => ({ ...obj, [key]: values[index] }), {})
+    if (this.priceChanged(updatedCoin.Flag) && updatedCoin.Price) {
+      this.setState({
+        price: updatedCoin.Price
+      })
     }
   }
 
@@ -33,13 +45,10 @@ export default class Coin extends React.Component {
       let messageType = message.substring(0, message.indexOf('~'))
       switch (messageType) {
         case CryptoCompare.STATIC.TYPE.CURRENTAGG:
-          console.log('current aggregate')
+          this.updateCoin(message, CryptoCompare.CURRENT.KEYS)
           break
         case CryptoCompare.STATIC.TYPE.FULLVOLUME:
-          console.log('full volume data')
-          break
-        case CryptoCompare.STATIC.TYPE.LOADCOMPLETE:
-          console.log('load is complete')
+          this.updateCoin(message, CryptoCompare.FULLVOLUME.KEYS)
           break
         case CryptoCompare.STATIC.TYPE.BADFORMAT:
           console.log('bad format')
@@ -54,6 +63,7 @@ export default class Coin extends React.Component {
     return (
       <View style={styles.container}>
         <Text>{this.state.symbol}</Text>
+        <Text>{this.state.price}</Text>
       </View>
     )
   }

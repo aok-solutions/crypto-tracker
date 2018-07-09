@@ -22,4 +22,15 @@ CryptoCompare.STATIC.TYPE = {
   'BADFORMAT': '401'
 }
 
+CryptoCompare.PRICEUP = 1
+CryptoCompare.PRICEDOWN = 2
+
+CryptoCompare.CURRENT = CryptoCompare.CURRENT || {}
+CryptoCompare.CURRENT.KEYS = "SubscriptionId~ExchangeName~FromCurrency~ToCurrency~Flag~Price~LastUpdate~LastVolume~LastVolumeTo~LastTradeId~Volume24h~Volume24hTo~LastMarket"
+
+
+CryptoCompare.FULLVOLUME = CryptoCompare.FULLVOLUME || {}
+CryptoCompare.FULLVOLUME.KEYS = "Type~ExchangeName~FromCurrency~ToCurrency~Flag~Price~LastUpdate~LastVolume~LastVolumeTo~LastTradeId~Volume24h~Volume24hTo~MaskInt"
+
+
 export default CryptoCompare
