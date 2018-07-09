@@ -9,13 +9,18 @@ export default class Coin extends React.Component {
     const { navigation } = this.props
     const symbol = navigation.getParam("symbol", "")
     this.socket = ioClient('https://streamer.cryptocompare.com/')
-    this.subscribeToCoinUpdates(symbol)
+
+    const currentAggregate = `5~CCCAGG~${symbol}~USD`
+    const fullVolume = `11~${symbol}`
+    const subscription = [ currentAggregate, fullVolume ]
+    this.subscribeToCoinUpdates(subscription)
 
     this.state = {
       symbol: symbol,
       price: '',
       lastMarket: '',
-      tradeId: ''
+      tradeId: '',
+      subscription: subscription
     }
   }
 
@@ -32,16 +37,12 @@ export default class Coin extends React.Component {
     }
   }
 
-  subscribeToCoinUpdates = (symbol) => {
-    let currentAggregate = `5~CCCAGG~${symbol}~USD`
-    let fullVolume = `11~${symbol}`
-    let subscription = [ currentAggregate, fullVolume ]
-
+  subscribeToCoinUpdates = (subscription) => {
     console.log('subscribing: ', subscription)
 
     this.socket.emit('SubAdd', { subs: subscription })
     this.socket.on('m', message => {
-      console.log('message emitted: ', message)
+      console.log('message: ', message)
       let messageType = message.substring(0, message.indexOf('~'))
       switch (messageType) {
         case CryptoCompare.STATIC.TYPE.CURRENTAGG:
@@ -50,6 +51,9 @@ export default class Coin extends React.Component {
         case CryptoCompare.STATIC.TYPE.FULLVOLUME:
           this.updateCoin(message, CryptoCompare.FULLVOLUME.KEYS)
           break
+        case CryptoCompare.STATIC.TYPE.LOADCOMPLETE:
+          console.log('finished loading updates')
+          break
         case CryptoCompare.STATIC.TYPE.BADFORMAT:
           console.log('bad format')
           break
@@ -57,6 +61,15 @@ export default class Coin extends React.Component {
           console.log('invalid message type')
       }
     })
+  }
+
+  unsubscribeFromUpdates = (subscription) => {
+    console.log('unsubscribing: ', subscription)
+    this.socket.emit('SubRemove', { subs: subscription })
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeFromUpdates(this.state.subscription)
   }
 
   render() {
